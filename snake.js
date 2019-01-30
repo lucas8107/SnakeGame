@@ -4,6 +4,7 @@ var direction = {};
 var food;
 var ctx;
 var score = 0;
+var gameover = false;
 
 window.onload = ()=>{
     direction.dir = 'r';
@@ -50,7 +51,7 @@ class Snake {
             this.body[i] = [this.body[i-1][0] - snakeSize, this.body[i-1][1]];
         }
 
-        setInterval(updateSnake, 150, this);
+        setTimeout(updateSnake, 120, this);
     }
 }
 
@@ -68,7 +69,26 @@ function updateFood() {
 
 function updateSnake(snake) {
 
-    snake.body.unshift([snake.body[0][0] + direction.x, snake.body[0][1] + direction.y]);
+    let temp_x = snake.body[0][0] + direction.x;
+    let temp_y = snake.body[0][1] + direction.y;
+    
+    if(temp_x >= 700) {
+        temp_x = 0;
+    }
+    if(temp_x < 0) {
+        temp_x = 700 - snakeSize;
+    }
+    
+    if(temp_y >= 500) {
+        temp_y = 0;
+    }
+    if(temp_y < 0) {
+        temp_y = 500 - snakeSize;
+    }
+    
+    snake.body.unshift([temp_x, temp_y]);
+    
+    checkGameOver(snake.body);
     
     if(snake.body[0][0] == food.x && snake.body[0][1] == food.y) {
         updateFood();
@@ -87,7 +107,26 @@ function updateSnake(snake) {
 
     drawScore();
     drawBlock(food.x, food.y);
+    
+    if(!gameover) {
+        setTimeout(updateSnake, 120, snake);
+    }
+    else{
+        // drawGameOver();
+    }
 
+}
+
+// function drawGameOver() {
+//     let img = document.getElementById('gameover');
+//     ctx.drawImage(img, 100, 20, 500, 500);
+// }
+
+function checkGameOver(body) {
+    for(let i = 1; i < body.length; i++) {
+        if(body[0][0] == body[i][0] && body[0][1] == body[i][1])
+            gameover = true;
+    }
 }
 
 function drawBlock(x, y) {
